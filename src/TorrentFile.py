@@ -3,23 +3,32 @@ import hashlib
 from datetime import datetime
 
 class TorrentFile:
-    def __init__(self, torrent_path: str) -> None:
-        self.__decode_torrent(torrent_path)
+    def __init__(self, path: str) -> None:
+        self.__decode_torrent(path)
 
-    def __decode_torrent(self, torrent_path: str) -> None:
-        with open(torrent_path, 'rb') as torrent_file:
-            decoded_dict = bencodepy.decode(torrent_file.read())
-            self.__announce = decoded_dict.get(b'announce', b'').decode()
-            self.__creation_date = decoded_dict.get(b'creation date', 0)
+    def __decode_torrent(self, path: str) -> None:
+        with open(path, 'rb') as torrent_file:
+            decoded_data: dict = bencodepy.decode(torrent_file.read())
+            self.__announce: str = decoded_data.get(b'announce', b'').decode()
+            self.__creation_date: int = decoded_data.get(b'creation date', 0)
 
-            info_dict = decoded_dict.get(b'info', {})
-            self.__length = info_dict.get(b'length', 0)
-            self.__name = info_dict.get(b'name', b'').decode()
-            self.__piece_length = info_dict.get(b'piece length', 0)
-            self.__info_hash = hashlib.sha1(bencodepy.encode(info_dict)).digest()
+            info: dict = decoded_data.get(b'info', {})
+            self.__length: int = info.get(b'length', 0)
+            self.__name: str = info.get(b'name', b'').decode()
+            self.__piece_length: int = info.get(b'piece length', 0)
+            self.__info_hash: bytes = hashlib.sha1(bencodepy.encode(info)).digest()
 
-            pieces = info_dict[b'pieces']
-            self.__piece_hashes = [pieces[i:i+20] for i in range(0, len(pieces), 20)]
+            pieces: bytes = info[b'pieces']
+            self.__piece_hashes: list[bytes] = [pieces[i:i+20] for i in range(0, len(pieces), 20)]
+
+    def get_info_hash(self) -> bytes:
+        return self.__info_hash
+
+    def get_length(self) -> int:
+        return self.__length
+
+    def get_announce(self) -> str:
+        return self.__announce
 
     def print_info(self) -> None:
         print('Torrent Info:')
