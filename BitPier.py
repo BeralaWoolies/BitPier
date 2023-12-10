@@ -6,17 +6,27 @@ from src.TorrentClient import TorrentClient
 # Constants
 PORT = 6881
 
-# parse command line arguments
-parser = argparse.ArgumentParser()
-parser.add_argument('torrent', help='The path to a torrent file to download (e.g file.torrent)')
-args = parser.parse_args()
+def parse_arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('torrent', help='The path to a torrent file to download (e.g file.torrent)')
+    return parser.parse_args()
 
-# start client
-client: TorrentClient = TorrentClient(args.torrent, PORT)
+def main():
+    # parse command line arguments
+    args = parse_arguments()
 
-# run client
-try:
-    asyncio.run(client.start())
-except ConnectionError as e:
-    print(f'Error: {e}', file=sys.stderr)
-    sys.exit(1)
+    # start client
+    client: TorrentClient = TorrentClient(args.torrent, PORT)
+
+    # run client
+    try:
+        asyncio.run(client.start())
+    except KeyboardInterrupt as e:
+        print('Quitting gracefully')
+    except Exception as e:
+        print(f'Error: {e}', file=sys.stderr)
+    finally:
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
