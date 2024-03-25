@@ -6,16 +6,19 @@ from src.TorrentClient import TorrentClient
 # Constants
 PORT = 6881
 
+
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument('torrent', help='The path to a torrent file to download (e.g file.torrent)')
+    parser.add_argument(
+        'torrent', help='The path to a torrent file to download (e.g file.torrent)')
     return parser.parse_args()
+
 
 def main():
     # parse command line arguments
     args = parse_arguments()
 
-    # start client
+    # start clients
     client: TorrentClient = TorrentClient(args.torrent, PORT)
 
     # run client
@@ -27,6 +30,7 @@ def main():
         print(f'Error: {e}', file=sys.stderr)
     finally:
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

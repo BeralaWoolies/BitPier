@@ -1,6 +1,6 @@
 import bencodepy
 import hashlib
-from datetime import datetime
+
 
 class TorrentFile:
     def __init__(self, path: str) -> None:
@@ -16,25 +16,35 @@ class TorrentFile:
             self.__length: int = info.get(b'length', 0)
             self.__name: str = info.get(b'name', b'').decode()
             self.__piece_length: int = info.get(b'piece length', 0)
-            self.__info_hash: bytes = hashlib.sha1(bencodepy.encode(info)).digest()
+            self.__info_hash: bytes = hashlib.sha1(
+                bencodepy.encode(info)).digest()
 
             pieces: bytes = info[b'pieces']
-            self.__piece_hashes: list[bytes] = [pieces[i:i+20] for i in range(0, len(pieces), 20)]
+            self.__piece_hashes: list[bytes] = [pieces[i:i+20]
+                                                for i in range(0, len(pieces), 20)]
 
-    def get_info_hash(self) -> bytes:
+    @property
+    def info_hash(self) -> bytes:
         return self.__info_hash
 
-    def get_length(self) -> int:
+    @property
+    def length(self) -> int:
         return self.__length
 
-    def get_announce(self) -> str:
+    @property
+    def announce(self) -> str:
         return self.__announce
 
-    def print_info(self) -> None:
-        print('Torrent Info:')
-        print(f'Name: {self.__name}')
-        print(f'Announce url: {self.__announce}')
-        print(f'Creation date: {self.__creation_date} | {datetime.fromtimestamp(self.__creation_date)}')
-        print(f'Length: {self.__length} bytes')
-        print(f'Piece length: {self.__piece_length} bytes')
-        print(f'Info hash: {self.__info_hash}')
+    @property
+    def piece_length(self) -> str:
+        return self.__piece_length
+
+    def __str__(self) -> str:
+        info: str = 'Torrent Info:\n'
+        info += f'Name: {self.__name}\n'
+        info += f'Announce url: {self.__announce}\n'
+        info += f'Creation date: {self.__creation_date}\n'
+        info += f'Length: {self.__length} bytes\n'
+        info += f'Piece length: {self.__piece_length} bytes\n'
+        info += f'Info hash: {self.__info_hash}'
+        return info
